@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+int main() {
+    int nf, nb;
+    printf("Enter the number of files and blocks:\n");
+    scanf("%d %d", &nf, &nb);
+
+    int f_size[nf], b_size[nb], frag[nf], b_status[nb], f_alloc[nf];
+    
+    // Initialize allocation and fragmentation arrays
+    for (int i = 0; i < nf; i++) {
+        f_alloc[i] = -1;  // No block allocated initially
+        frag[i] = 0;      // No fragmentation initially
+    }
+    for (int i = 0; i < nb; i++) {
+        b_status[i] = 0;  // All blocks are free initially
+    }
+    
+    // Input file sizes
+    for (int i = 0; i < nf; i++) {
+        printf("Enter the file size of file %d:\n", i + 1);
+        scanf("%d", &f_size[i]);
+    }
+    
+    // Input block sizes and statuses
+    for (int i = 0; i < nb; i++) {
+        printf("Enter the block size and block status of block %d:\n", i + 1);
+        scanf("%d %d", &b_size[i], &b_status[i]);
+    }
+    
+    // File allocation using First Fit
+    for (int i = 0; i < nf; i++) {
+        for (int j = 0; j < nb; j++) {
+            if (!b_status[j] && f_size[i] <= b_size[j]) { // Check if block is free and can fit the file
+                frag[i] = b_size[j] - f_size[i];  // Calculate fragmentation
+                f_alloc[i] = j;                   // Allocate block j to file i
+                b_status[j] = 1;                  // Mark block as allocated
+                break;
+            }
+        }
+    }
+    
+    // Display allocation details
+    printf("\nFile Allocation Details:\n");
+    printf("File No.\tFile Size\tBlock No.\tFragmentation\n");
+    for (int i = 0; i < nf; i++) {
+        if (f_alloc[i] != -1) {
+            printf("%d\t\t%d\t\t%d\t\t%d\n", i + 1, f_size[i], f_alloc[i] + 1, frag[i]);
+        } else {
+            printf("%d\t\t%d\t\tNot Allocated\tN/A\n", i + 1, f_size[i]);
+        }
+    }
+    
+    return 0;
+}
